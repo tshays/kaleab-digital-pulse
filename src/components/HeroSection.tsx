@@ -24,8 +24,23 @@ const HeroSection: React.FC<HeroSectionProps> = ({ language }) => {
     }
   };
 
+  const scrollToProjects = () => {
+    const projectsSection = document.querySelector('#projects');
+    if (projectsSection) {
+      projectsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section ref={ref} className="min-h-screen relative flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#16425B] via-[#3A7CA5] to-[#81C3D7]">
+      {/* Admin Button - Top Right */}
+      <a 
+        href="/admin"
+        className="fixed top-4 right-4 z-50 bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-white/20 transition-all duration-300 border border-white/20"
+      >
+        Admin
+      </a>
+
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Floating Medical Icons */}
@@ -77,10 +92,13 @@ const HeroSection: React.FC<HeroSectionProps> = ({ language }) => {
               {content[language].description}
             </p>
             
-            <button className={`bg-white text-[#16425B] px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold text-base md:text-lg 
-                               hover:scale-105 hover:shadow-2xl transition-all duration-300
-                               transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}
-                               delay-900`}>
+            <button 
+              onClick={scrollToProjects}
+              className={`bg-white text-[#16425B] px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold text-base md:text-lg 
+                         hover:scale-105 hover:shadow-2xl transition-all duration-300 cursor-pointer
+                         transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}
+                         delay-900`}
+            >
               {content[language].cta}
             </button>
           </div>

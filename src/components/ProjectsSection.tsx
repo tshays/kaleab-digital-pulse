@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 import { collection, getDocs } from 'firebase/firestore';
@@ -67,7 +66,7 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ language }) => {
 
   if (loading) {
     return (
-      <section ref={ref} className="py-20 bg-white">
+      <section id="projects" ref={ref} className="py-20 bg-white">
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-center py-20">
             <div className="flex items-center gap-3 text-[#16425B]">
@@ -81,7 +80,7 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ language }) => {
   }
 
   return (
-    <section ref={ref} className="py-20 bg-white">
+    <section id="projects" ref={ref} className="py-20 bg-white">
       <div className="container mx-auto px-6">
         <h2 className={`text-3xl md:text-4xl lg:text-5xl font-bold text-[#16425B] mb-12 text-center transform transition-all duration-1000 ${
           isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
