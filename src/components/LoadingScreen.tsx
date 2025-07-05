@@ -70,31 +70,6 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
           <span className="animate-pulse">|</span>
         </div>
       </div>
-
-      <style jsx>{`
-        .ecg-line {
-          position: absolute;
-          top: 50%;
-          left: -100%;
-          width: 100%;
-          height: 2px;
-          background: linear-gradient(
-            90deg,
-            transparent 0%,
-            #81C3D7 20%,
-            #81C3D7 40%,
-            transparent 60%,
-            transparent 100%
-          );
-          animation: ecg-move 2s linear infinite;
-          transform: translateY(-50%);
-        }
-        
-        @keyframes ecg-move {
-          0% { left: -100%; }
-          100% { left: 100%; }
-        }
-      `}</style>
     </div>
   );
 };

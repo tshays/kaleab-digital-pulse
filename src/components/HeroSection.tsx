@@ -26,7 +26,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ language }) => {
 
   return (
     <section ref={ref} className="min-h-screen relative flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#16425B] via-[#3A7CA5] to-[#81C3D7]">
-      {/* Animated Background Elements */}
+      {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Floating Medical Icons */}
         <div className="absolute top-1/4 left-1/4 w-8 h-8 text-white/20 animate-bounce" style={{ animationDelay: '0s' }}>
@@ -116,40 +116,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ language }) => {
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-        }
-        
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
-        }
-        
-        .ecg-background {
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 200%;
-          height: 2px;
-          background: repeating-linear-gradient(
-            90deg,
-            transparent 0px,
-            transparent 20px,
-            rgba(255,255,255,0.3) 20px,
-            rgba(255,255,255,0.3) 22px,
-            transparent 22px,
-            transparent 40px
-          );
-          animation: ecg-slide 4s linear infinite;
-        }
-        
-        @keyframes ecg-slide {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-      `}</style>
     </section>
   );
 };
