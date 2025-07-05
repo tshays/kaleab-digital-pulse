@@ -1,68 +1,106 @@
 
-import React, { useState } from 'react';
-import { Upload, Edit, Trash2, Save } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Upload, Edit, Trash2, Save, Loader } from 'lucide-react';
+import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db, storage } from '../lib/firebase';
+
+interface Project {
+  id: string;
+  title: string;
+  category: 'medical' | 'design';
+  description: string;
+  image: string;
+}
 
 const Admin = () => {
-  const [projects, setProjects] = useState([
-    {
-      id: 1,
-      title: 'Health Informatics Dashboard',
-      category: 'medical',
-      description: 'Interactive patient data visualization system',
-      image: 'https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=400'
-    }
-  ]);
-
+  const [projects, setProjects] = useState<Project[]>([]);
   const [newProject, setNewProject] = useState({
     title: '',
-    category: 'medical',
+    category: 'medical' as 'medical' | 'design',
     description: '',
     image: ''
   });
+  const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
-  const [editingId, setEditingId] = useState<number | null>(null);
+  // Fetch projects from Firebase
+  useEffect(() => {
+    fetchProjects();
+  }, []);
 
-  const handleAddProject = () => {
-    if (newProject.title && newProject.description) {
-      const project = {
-        id: Date.now(),
-        ...newProject
-      };
-      setProjects([...projects, project]);
-      setNewProject({ title: '', category: 'medical', description: '', image: '' });
+  const fetchProjects = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'projects'));
+      const projectsData = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Project[];
+      setProjects(projectsData);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
     }
   };
 
-  const handleDeleteProject = (id: number) => {
-    setProjects(projects.filter(p => p.id !== id));
+  const handleAddProject = async () => {
+    if (newProject.title && newProject.description && newProject.image) {
+      setLoading(true);
+      try {
+        await addDoc(collection(db, 'projects'), {
+          title: newProject.title,
+          category: newProject.category,
+          description: newProject.description,
+          image: newProject.image,
+          createdAt: new Date()
+        });
+        setNewProject({ title: '', category: 'medical', description: '', image: '' });
+        fetchProjects();
+      } catch (error) {
+        console.error('Error adding project:', error);
+      }
+      setLoading(false);
+    }
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDeleteProject = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'projects', id));
+      fetchProjects();
+    } catch (error) {
+      console.error('Error deleting project:', error);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // In a real implementation, this would upload to Firebase Storage
-      const reader = new FileReader();
-      reader.onload = (e) => {
+      setUploadingImage(true);
+      try {
+        const storageRef = ref(storage, `projects/${Date.now()}_${file.name}`);
+        await uploadBytes(storageRef, file);
+        const downloadURL = await getDownloadURL(storageRef);
         setNewProject(prev => ({
           ...prev,
-          image: e.target?.result as string
+          image: downloadURL
         }));
-      };
-      reader.readAsDataURL(file);
+      } catch (error) {
+        console.error('Error uploading image:', error);
+      }
+      setUploadingImage(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#D9DCD6] p-6">
+    <div className="min-h-screen bg-[#D9DCD6] p-4 md:p-6">
       <div className="max-w-6xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h1 className="text-3xl font-bold text-[#16425B] mb-8 flex items-center gap-3">
+        <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8">
+          <h1 className="text-2xl md:text-3xl font-bold text-[#16425B] mb-8 flex items-center gap-3">
             <Edit size={32} />
             Admin Panel - Dr. Kaleab's Portfolio
           </h1>
 
           {/* Add New Project Form */}
-          <div className="bg-[#D9DCD6] p-6 rounded-xl mb-8">
+          <div className="bg-[#D9DCD6] p-4 md:p-6 rounded-xl mb-8">
             <h2 className="text-xl font-semibold text-[#16425B] mb-4">Add New Project</h2>
             <div className="grid md:grid-cols-2 gap-4">
               <input
@@ -74,7 +112,7 @@ const Admin = () => {
               />
               <select
                 value={newProject.category}
-                onChange={(e) => setNewProject(prev => ({ ...prev, category: e.target.value }))}
+                onChange={(e) => setNewProject(prev => ({ ...prev, category: e.target.value as 'medical' | 'design' }))}
                 className="px-4 py-3 rounded-lg border border-gray-300 focus:border-[#3A7CA5] focus:outline-none"
               >
                 <option value="medical">Medical Work</option>
@@ -95,50 +133,64 @@ const Admin = () => {
                   type="file"
                   accept="image/*"
                   onChange={handleImageUpload}
+                  disabled={uploadingImage}
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#3A7CA5] focus:outline-none"
                 />
+                {uploadingImage && (
+                  <div className="flex items-center gap-2 mt-2 text-[#3A7CA5]">
+                    <Loader size={16} className="animate-spin" />
+                    <span className="text-sm">Uploading image...</span>
+                  </div>
+                )}
               </div>
               <button
                 onClick={handleAddProject}
-                className="md:col-span-2 bg-[#16425B] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#3A7CA5] transition-colors flex items-center justify-center gap-2"
+                disabled={loading || uploadingImage || !newProject.title || !newProject.description || !newProject.image}
+                className="md:col-span-2 bg-[#16425B] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#3A7CA5] transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Save size={20} />
-                Add Project
+                {loading ? <Loader size={20} className="animate-spin" /> : <Save size={20} />}
+                {loading ? 'Adding Project...' : 'Add Project'}
               </button>
             </div>
           </div>
 
           {/* Projects List */}
           <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-[#16425B] mb-4">Existing Projects</h2>
-            {projects.map((project) => (
-              <div key={project.id} className="bg-gray-50 p-6 rounded-xl flex items-center gap-4">
-                {project.image && (
-                  <img 
-                    src={project.image} 
-                    alt={project.title}
-                    className="w-20 h-20 object-cover rounded-lg"
-                  />
-                )}
-                <div className="flex-1">
-                  <h3 className="font-semibold text-[#16425B]">{project.title}</h3>
-                  <p className="text-sm text-gray-600 capitalize">{project.category}</p>
-                  <p className="text-sm text-gray-700 mt-1">{project.description}</p>
-                </div>
-                <button
-                  onClick={() => handleDeleteProject(project.id)}
-                  className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-colors"
-                >
-                  <Trash2 size={20} />
-                </button>
+            <h2 className="text-xl font-semibold text-[#16425B] mb-4">Existing Projects ({projects.length})</h2>
+            {projects.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                No projects found. Add your first project above.
               </div>
-            ))}
+            ) : (
+              projects.map((project) => (
+                <div key={project.id} className="bg-gray-50 p-4 md:p-6 rounded-xl flex flex-col md:flex-row items-start md:items-center gap-4">
+                  {project.image && (
+                    <img 
+                      src={project.image} 
+                      alt={project.title}
+                      className="w-full md:w-20 h-32 md:h-20 object-cover rounded-lg"
+                    />
+                  )}
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-[#16425B] text-lg">{project.title}</h3>
+                    <p className="text-sm text-gray-600 capitalize mb-1">{project.category}</p>
+                    <p className="text-sm text-gray-700">{project.description}</p>
+                  </div>
+                  <button
+                    onClick={() => handleDeleteProject(project.id)}
+                    className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-colors self-end md:self-center"
+                  >
+                    <Trash2 size={20} />
+                  </button>
+                </div>
+              ))
+            )}
           </div>
 
-          <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <p className="text-sm text-yellow-800">
-              <strong>Note:</strong> This is a basic admin panel. In production, this would be connected to Firebase 
-              for real-time data storage and would include proper authentication.
+          <div className="mt-8 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <p className="text-sm text-green-800">
+              <strong>Firebase Connected:</strong> Your projects are now stored in Firebase Firestore and images in Firebase Storage. 
+              Changes will reflect immediately on the main website.
             </p>
           </div>
         </div>
