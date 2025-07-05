@@ -11,7 +11,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ language }) => {
 
   const content = {
     en: {
-      title: "About Dr. Kaleab",
+      title: "About Me",
       description: "A passionate medical professional who seamlessly blends healthcare expertise with innovative technology and creative design. With extensive experience in health informatics and a keen eye for visual communication, Dr. Kaleab bridges the gap between medical practice and digital innovation.",
       skills: [
         "Medical Practice & Patient Care",
@@ -22,7 +22,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ language }) => {
       ]
     },
     fr: {
-      title: "À Propos du Dr. Kaleab",
+      title: "À Propos de Moi",
       description: "Un professionnel médical passionné qui allie harmonieusement l'expertise en soins de santé avec la technologie innovante et le design créatif. Avec une vaste expérience en informatique de santé et un œil aiguisé pour la communication visuelle, le Dr. Kaleab fait le pont entre la pratique médicale et l'innovation numérique.",
       skills: [
         "Pratique Médicale & Soins aux Patients",
@@ -78,7 +78,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ language }) => {
                     <div className="text-sm text-[#16425B]/70">{language === 'en' ? 'Projects Completed' : 'Projets Complétés'}</div>
                   </div>
                   <div className="p-4">
-                    <div className="text-3xl font-bold text-[#81C3D7] mb-2">2</div>
+                    <div className="text-3xl font-bold text-[#81C3D7] mb-2">4</div>
                     <div className="text-sm text-[#16425B]/70">{language === 'en' ? 'Languages' : 'Langues'}</div>
                   </div>
                   <div className="p-4">

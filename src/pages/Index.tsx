@@ -5,6 +5,7 @@ import LanguageToggle from '../components/LanguageToggle';
 import HeroSection from '../components/HeroSection';
 import AboutSection from '../components/AboutSection';
 import ProjectsSection from '../components/ProjectsSection';
+import ContactSection from '../components/ContactSection';
 import Footer from '../components/Footer';
 
 const Index = () => {
@@ -29,6 +30,7 @@ const Index = () => {
       <HeroSection language={language} />
       <AboutSection language={language} />
       <ProjectsSection language={language} />
+      <ContactSection language={language} />
       <Footer language={language} />
     </div>
   );
