@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -122,26 +121,30 @@ All colors MUST be HSL.
 /* Enhanced Loading Animations */
 @keyframes stethoscope-listening {
   0%, 100% { 
-    transform: translateY(0) rotate(-2deg) scale(1); 
+    transform: translateY(0) rotate(-1deg) scale(1); 
   }
   25% { 
-    transform: translateY(-8px) rotate(2deg) scale(1.02); 
+    transform: translateY(-6px) rotate(1deg) scale(1.01); 
   }
   50% { 
-    transform: translateY(-4px) rotate(-1deg) scale(1.01); 
+    transform: translateY(-3px) rotate(-0.5deg) scale(1.005); 
   }
   75% { 
-    transform: translateY(-12px) rotate(1deg) scale(1.03); 
+    transform: translateY(-8px) rotate(0.5deg) scale(1.02); 
   }
 }
 
-@keyframes pulse-ring {
+@keyframes pulse-ring-realistic {
   0% {
-    transform: scale(0.8);
-    opacity: 1;
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.4;
   }
   100% {
-    transform: scale(2);
+    transform: scale(1.6);
     opacity: 0;
   }
 }
@@ -156,7 +159,7 @@ All colors MUST be HSL.
 }
 
 .animate-stethoscope-listening {
-  animation: stethoscope-listening 4s ease-in-out infinite;
+  animation: stethoscope-listening 3s ease-in-out infinite;
 }
 
 /* Enhanced Loading Screen Elements */
@@ -167,14 +170,16 @@ All colors MUST be HSL.
   justify-content: center;
 }
 
-.pulse-ring {
+.pulse-ring-realistic {
   position: absolute;
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   border: 2px solid #81C3D7;
   border-radius: 50%;
-  animation: pulse-ring 2s ease-out infinite;
-  opacity: 0.3;
+  animation: pulse-ring-realistic 2.5s ease-out infinite;
+  opacity: 0.6;
+  right: 35px;
+  bottom: 35px;
 }
 
 /* ECG Background for Footer */

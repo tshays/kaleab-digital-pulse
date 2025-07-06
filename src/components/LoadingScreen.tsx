@@ -24,7 +24,6 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
         index++;
         setTimeout(typeText, 50);
       } else {
-        // Switch language after completing typing
         setTimeout(() => {
           setCurrentLanguage(currentLanguage === 'en' ? 'fr' : 'en');
           setText('');
@@ -47,35 +46,61 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
   return (
     <div className="fixed inset-0 bg-[#16425B] flex items-center justify-center z-50">
       <div className="text-center">
-        {/* Single Stethoscope Animation */}
+        {/* Realistic Stethoscope Animation */}
         <div className="w-32 h-32 mb-8 mx-auto relative">
           <div className="stethoscope-container">
             <svg 
               className="w-full h-full text-[#81C3D7] animate-stethoscope-listening" 
-              fill="currentColor" 
-              viewBox="0 0 24 24"
+              fill="none" 
+              stroke="currentColor"
+              strokeWidth="3"
+              viewBox="0 0 200 200"
             >
-              {/* Stethoscope Body */}
-              <path d="M19.43 8.56c.18-.06.36-.06.54 0 .93.31 1.47 1.31 1.16 2.24-.31.93-1.31 1.47-2.24 1.16-.93-.31-1.47-1.31-1.16-2.24.22-.66.78-1.11 1.42-1.16v-.88c0-2.42-1.96-4.38-4.38-4.38h-.62c-.38 0-.69-.31-.69-.69s.31-.69.69-.69h.62c3.18 0 5.76 2.58 5.76 5.76v.88zm-5.81 2.2c0 .76-.62 1.38-1.38 1.38s-1.38-.62-1.38-1.38c0-.76.62-1.38 1.38-1.38s1.38.62 1.38 1.38z"/>
+              {/* Left Earpiece */}
+              <circle cx="60" cy="30" r="8" fill="#3A7CA5"/>
               
-              {/* Earpieces */}
-              <path d="M8 2C7.45 2 7 2.45 7 3s.45 1 1 1 1-.45 1-1-.45-1-1-1zm8 0c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"/>
+              {/* Right Earpiece */}
+              <circle cx="140" cy="30" r="8" fill="#3A7CA5"/>
               
-              {/* Tubes */}
-              <path d="M8 4v4c0 2.21 1.79 4 4 4s4-1.79 4-4V4M12 12v4" 
-                    stroke="currentColor" 
-                    strokeWidth="2" 
-                    fill="none" 
-                    className="animate-pulse"/>
+              {/* Left Tube from earpiece */}
+              <path d="M 60 38 Q 60 60 70 80 Q 80 100 100 110" 
+                    stroke="#81C3D7" 
+                    strokeWidth="4" 
+                    fill="none"/>
               
-              {/* Chest piece */}
-              <circle cx="12" cy="18" r="2" className="animate-pulse"/>
+              {/* Right Tube from earpiece */}
+              <path d="M 140 38 Q 140 60 130 80 Q 120 100 100 110" 
+                    stroke="#81C3D7" 
+                    strokeWidth="4" 
+                    fill="none"/>
+              
+              {/* Main tube going down */}
+              <path d="M 100 110 L 100 140 Q 100 160 120 170" 
+                    stroke="#81C3D7" 
+                    strokeWidth="4" 
+                    fill="none"/>
+              
+              {/* Chest piece connector */}
+              <circle cx="120" cy="170" r="4" fill="#3A7CA5"/>
+              
+              {/* Main chest piece (diaphragm) */}
+              <circle cx="120" cy="170" r="15" 
+                      fill="none" 
+                      stroke="#81C3D7" 
+                      strokeWidth="3"
+                      className="animate-pulse"/>
+              
+              {/* Inner diaphragm */}
+              <circle cx="120" cy="170" r="10" 
+                      fill="#3A7CA5" 
+                      opacity="0.3"
+                      className="animate-pulse"/>
             </svg>
           </div>
           
-          {/* Subtle pulse ring */}
+          {/* Pulse ring around chest piece */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="pulse-ring"></div>
+            <div className="pulse-ring-realistic"></div>
           </div>
         </div>
         
