@@ -7,6 +7,7 @@ import AboutSection from '../components/AboutSection';
 import ProjectsSection from '../components/ProjectsSection';
 import ContactSection from '../components/ContactSection';
 import Footer from '../components/Footer';
+import AIChatWidget from '../components/AIChatWidget';
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -32,6 +33,7 @@ const Index = () => {
       <ProjectsSection language={language} />
       <ContactSection language={language} />
       <Footer language={language} />
+      <AIChatWidget />
     </div>
   );
 };
