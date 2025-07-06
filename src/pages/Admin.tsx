@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Upload, Edit, Trash2, Save, Loader } from 'lucide-react';
+import { Upload, Edit, Trash2, Save, Loader, AlertCircle } from 'lucide-react';
 import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../lib/firebase';
@@ -23,6 +23,7 @@ const Admin = () => {
   });
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch projects from Firebase
   useEffect(() => {
@@ -39,12 +40,14 @@ const Admin = () => {
       setProjects(projectsData);
     } catch (error) {
       console.error('Error fetching projects:', error);
+      setError('Failed to fetch projects. Please try again.');
     }
   };
 
   const handleAddProject = async () => {
     if (newProject.title && newProject.description && newProject.image) {
       setLoading(true);
+      setError(null);
       try {
         await addDoc(collection(db, 'projects'), {
           title: newProject.title,
@@ -57,6 +60,7 @@ const Admin = () => {
         fetchProjects();
       } catch (error) {
         console.error('Error adding project:', error);
+        setError('Failed to add project. Please try again.');
       }
       setLoading(false);
     }
@@ -68,6 +72,7 @@ const Admin = () => {
       fetchProjects();
     } catch (error) {
       console.error('Error deleting project:', error);
+      setError('Failed to delete project. Please try again.');
     }
   };
 
@@ -75,16 +80,30 @@ const Admin = () => {
     const file = e.target.files?.[0];
     if (file) {
       setUploadingImage(true);
+      setError(null);
       try {
-        const storageRef = ref(storage, `projects/${Date.now()}_${file.name}`);
-        await uploadBytes(storageRef, file);
-        const downloadURL = await getDownloadURL(storageRef);
+        // Create a unique filename
+        const timestamp = Date.now();
+        const filename = `${timestamp}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+        const storageRef = ref(storage, `projects/${filename}`);
+        
+        console.log('Uploading file:', filename);
+        
+        // Upload file
+        const snapshot = await uploadBytes(storageRef, file);
+        console.log('Upload successful, getting download URL...');
+        
+        // Get download URL
+        const downloadURL = await getDownloadURL(snapshot.ref);
+        console.log('Download URL obtained:', downloadURL);
+        
         setNewProject(prev => ({
           ...prev,
           image: downloadURL
         }));
       } catch (error) {
         console.error('Error uploading image:', error);
+        setError('Failed to upload image. Please check Firebase Storage configuration and try again.');
       }
       setUploadingImage(false);
     }
@@ -98,6 +117,20 @@ const Admin = () => {
             <Edit size={32} />
             Admin Panel - Dr. Kaleab's Portfolio
           </h1>
+
+          {/* Error Display */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 flex items-center gap-3">
+              <AlertCircle className="text-red-500" size={20} />
+              <span className="text-red-700">{error}</span>
+              <button 
+                onClick={() => setError(null)}
+                className="ml-auto text-red-500 hover:text-red-700"
+              >
+                ×
+              </button>
+            </div>
+          )}
 
           {/* Add New Project Form */}
           <div className="bg-[#D9DCD6] p-4 md:p-6 rounded-xl mb-8">
@@ -140,6 +173,15 @@ const Admin = () => {
                   <div className="flex items-center gap-2 mt-2 text-[#3A7CA5]">
                     <Loader size={16} className="animate-spin" />
                     <span className="text-sm">Uploading image...</span>
+                  </div>
+                )}
+                {newProject.image && (
+                  <div className="mt-2">
+                    <img 
+                      src={newProject.image} 
+                      alt="Preview" 
+                      className="w-20 h-20 object-cover rounded-lg"
+                    />
                   </div>
                 )}
               </div>
@@ -187,10 +229,10 @@ const Admin = () => {
             )}
           </div>
 
-          <div className="mt-8 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <p className="text-sm text-green-800">
-              <strong>Firebase Connected:</strong> Your projects are now stored in Firebase Firestore and images in Firebase Storage. 
-              Changes will reflect immediately on the main website.
+          <div className="mt-8 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+            <p className="text-sm text-amber-800">
+              <strong>Note:</strong> If you're experiencing upload issues, the Firebase Storage may need CORS configuration. 
+              Please ensure your Firebase Storage rules allow public uploads and the CORS policy is properly configured.
             </p>
           </div>
         </div>

@@ -1,7 +1,7 @@
 
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
+import { getStorage, connectStorageEmulator } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAk7XbX7kfGe6vM6SrRPHAL1NVAh9GmI_4",
@@ -16,4 +16,10 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
+
+// Configure storage settings for better CORS handling
+const storageConfig = {
+  cacheSizeBytes: 40000000, // 40MB cache
+};
+
 export default app;
