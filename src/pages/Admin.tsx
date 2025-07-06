@@ -2,8 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Upload, Edit, Trash2, Save, Loader, AlertCircle } from 'lucide-react';
 import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../lib/firebase';
+import { db } from '../lib/firebase';
 
 interface Project {
   id: string;
@@ -76,34 +75,38 @@ const Admin = () => {
     }
   };
 
+  const convertToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
+  };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Check file size (limit to 1MB to avoid Firestore document size limits)
+      if (file.size > 1024 * 1024) {
+        setError('Image size should be less than 1MB. Please compress the image and try again.');
+        return;
+      }
+
       setUploadingImage(true);
       setError(null);
       try {
-        // Create a unique filename
-        const timestamp = Date.now();
-        const filename = `${timestamp}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-        const storageRef = ref(storage, `projects/${filename}`);
-        
-        console.log('Uploading file:', filename);
-        
-        // Upload file
-        const snapshot = await uploadBytes(storageRef, file);
-        console.log('Upload successful, getting download URL...');
-        
-        // Get download URL
-        const downloadURL = await getDownloadURL(snapshot.ref);
-        console.log('Download URL obtained:', downloadURL);
+        console.log('Converting image to base64...');
+        const base64String = await convertToBase64(file);
+        console.log('Image converted successfully');
         
         setNewProject(prev => ({
           ...prev,
-          image: downloadURL
+          image: base64String
         }));
       } catch (error) {
-        console.error('Error uploading image:', error);
-        setError('Failed to upload image. Please check Firebase Storage configuration and try again.');
+        console.error('Error converting image:', error);
+        setError('Failed to process image. Please try again.');
       }
       setUploadingImage(false);
     }
@@ -160,7 +163,7 @@ const Admin = () => {
               />
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-[#16425B] mb-2">
-                  Upload Image
+                  Upload Image (Max 1MB)
                 </label>
                 <input
                   type="file"
@@ -172,7 +175,7 @@ const Admin = () => {
                 {uploadingImage && (
                   <div className="flex items-center gap-2 mt-2 text-[#3A7CA5]">
                     <Loader size={16} className="animate-spin" />
-                    <span className="text-sm">Uploading image...</span>
+                    <span className="text-sm">Processing image...</span>
                   </div>
                 )}
                 {newProject.image && (
@@ -229,10 +232,10 @@ const Admin = () => {
             )}
           </div>
 
-          <div className="mt-8 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-            <p className="text-sm text-amber-800">
-              <strong>Note:</strong> If you're experiencing upload issues, the Firebase Storage may need CORS configuration. 
-              Please ensure your Firebase Storage rules allow public uploads and the CORS policy is properly configured.
+          <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-800">
+              <strong>Note:</strong> Images are now stored directly in the database as base64 data to avoid Firebase Storage CORS issues. 
+              Please keep image files under 1MB for optimal performance.
             </p>
           </div>
         </div>
