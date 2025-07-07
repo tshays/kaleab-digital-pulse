@@ -9,31 +9,55 @@ interface Message {
   timestamp: Date;
 }
 
-const AIChatWidget: React.FC = () => {
+interface AIChatWidgetProps {
+  language: 'en' | 'fr';
+}
+
+const AIChatWidget: React.FC<AIChatWidgetProps> = ({ language }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      text: "Hello! I'm Dr. Kaleab's virtual assistant. I can tell you about Dr. Kaleab Nigusse's background, education, experience, and expertise. What would you like to know?",
-      isUser: false,
-      timestamp: new Date()
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Dr. Kaleab's background information
+  // Initialize welcome message based on language
+  useEffect(() => {
+    const welcomeMessage = language === 'fr' 
+      ? "Bonjour ! Je suis l'assistant virtuel du Dr Kaleab. Je peux vous parler du parcours, de l'éducation, de l'expérience et de l'expertise du Dr Kaleab Nigusse. Que souhaitez-vous savoir ?"
+      : "Hello! I'm Dr. Kaleab's virtual assistant. I can tell you about Dr. Kaleab Nigusse's background, education, experience, and expertise. What would you like to know?";
+    
+    setMessages([{
+      id: '1',
+      text: welcomeMessage,
+      isUser: false,
+      timestamp: new Date()
+    }]);
+  }, [language]);
+
+  // Dr. Kaleab's background information in both languages
   const drKaleabInfo = {
-    education: "Dr. Kaleab Nigusse is a Medical Doctor (MD) with specialized training in Health Informatics, combining clinical expertise with technology innovation.",
-    experience: "He has extensive experience as both a practicing physician and a Senior Graphic Designer, uniquely bridging healthcare, technology, and creative design fields.",
-    specialties: "His areas of expertise include clinical medicine, health informatics, medical technology, graphic design, and healthcare communication.",
-    location: "Based in Dire Dawa, Ethiopia (Rue de France, Kezira), Dr. Kaleab serves both local and international clients.",
-    vision: "Dr. Kaleab is passionate about modernizing healthcare through technology and improving medical communication through thoughtful design.",
-    contact: "You can reach Dr. Kaleab at kalsonofzion@gmail.com, +251-91-023-7506, or visit his website at https://drkal.netlify.app/",
-    linkedin: "Connect with him professionally on LinkedIn at linkedin.com/in/kaleab-nigusse-md-885084111",
-    skills: "He excels in medical practice, health informatics systems, graphic design, web development, and healthcare technology integration.",
-    mission: "His mission is to bridge the gap between traditional healthcare and modern technology, making medical services more accessible and effective."
+    en: {
+      education: "Dr. Kaleab Nigusse is a Medical Doctor (MD) with specialized training in Health Informatics, combining clinical expertise with technology innovation.",
+      experience: "He has extensive experience as both a practicing physician and a Senior Graphic Designer, uniquely bridging healthcare, technology, and creative design fields.",
+      specialties: "His areas of expertise include clinical medicine, health informatics, medical technology, graphic design, and healthcare communication.",
+      location: "Based in Dire Dawa, Ethiopia (Rue de France, Kezira), Dr. Kaleab serves both local and international clients.",
+      vision: "Dr. Kaleab is passionate about modernizing healthcare through technology and improving medical communication through thoughtful design.",
+      contact: "You can reach Dr. Kaleab at kalsonofzion@gmail.com, +251-91-023-7506, or visit his website at https://drkal.netlify.app/",
+      linkedin: "Connect with him professionally on LinkedIn at linkedin.com/in/kaleab-nigusse-md-885084111",
+      skills: "He excels in medical practice, health informatics systems, graphic design, web development, and healthcare technology integration.",
+      mission: "His mission is to bridge the gap between traditional healthcare and modern technology, making medical services more accessible and effective."
+    },
+    fr: {
+      education: "Le Dr Kaleab Nigusse est Docteur en Médecine (MD) avec une formation spécialisée en Informatique de Santé, combinant expertise clinique et innovation technologique.",
+      experience: "Il possède une vaste expérience en tant que médecin praticien et Graphiste Senior, reliant de manière unique les domaines de la santé, de la technologie et du design créatif.",
+      specialties: "Ses domaines d'expertise incluent la médecine clinique, l'informatique de santé, la technologie médicale, le design graphique et la communication en santé.",
+      location: "Basé à Dire Dawa, Éthiopie (Rue de France, Kezira), le Dr Kaleab sert des clients locaux et internationaux.",
+      vision: "Le Dr Kaleab est passionné par la modernisation des soins de santé grâce à la technologie et l'amélioration de la communication médicale par un design réfléchi.",
+      contact: "Vous pouvez contacter le Dr Kaleab à kalsonofzion@gmail.com, +251-91-023-7506, ou visiter son site web à https://drkal.netlify.app/",
+      linkedin: "Connectez-vous avec lui professionnellement sur LinkedIn à linkedin.com/in/kaleab-nigusse-md-885084111",
+      skills: "Il excelle dans la pratique médicale, les systèmes d'informatique de santé, le design graphique, le développement web et l'intégration technologique en santé.",
+      mission: "Sa mission est de combler le fossé entre les soins de santé traditionnels et la technologie moderne, rendant les services médicaux plus accessibles et efficaces."
+    }
   };
 
   const scrollToBottom = () => {
@@ -46,25 +70,37 @@ const AIChatWidget: React.FC = () => {
 
   const getResponseForQuery = (query: string): string => {
     const lowerQuery = query.toLowerCase();
+    const info = drKaleabInfo[language];
     
-    if (lowerQuery.includes('education') || lowerQuery.includes('study') || lowerQuery.includes('degree')) {
-      return drKaleabInfo.education;
-    } else if (lowerQuery.includes('experience') || lowerQuery.includes('work') || lowerQuery.includes('career')) {
-      return drKaleabInfo.experience;
-    } else if (lowerQuery.includes('specialty') || lowerQuery.includes('expertise') || lowerQuery.includes('skill')) {
-      return drKaleabInfo.specialties + " " + drKaleabInfo.skills;
-    } else if (lowerQuery.includes('contact') || lowerQuery.includes('reach') || lowerQuery.includes('phone') || lowerQuery.includes('email')) {
-      return drKaleabInfo.contact;
-    } else if (lowerQuery.includes('location') || lowerQuery.includes('where') || lowerQuery.includes('address')) {
-      return drKaleabInfo.location;
+    if (lowerQuery.includes('education') || lowerQuery.includes('study') || lowerQuery.includes('degree') || 
+        lowerQuery.includes('éducation') || lowerQuery.includes('étude') || lowerQuery.includes('diplôme')) {
+      return info.education;
+    } else if (lowerQuery.includes('experience') || lowerQuery.includes('work') || lowerQuery.includes('career') ||
+               lowerQuery.includes('expérience') || lowerQuery.includes('travail') || lowerQuery.includes('carrière')) {
+      return info.experience;
+    } else if (lowerQuery.includes('specialty') || lowerQuery.includes('expertise') || lowerQuery.includes('skill') ||
+               lowerQuery.includes('spécialité') || lowerQuery.includes('compétence')) {
+      return info.specialties + " " + info.skills;
+    } else if (lowerQuery.includes('contact') || lowerQuery.includes('reach') || lowerQuery.includes('phone') || lowerQuery.includes('email') ||
+               lowerQuery.includes('contacter') || lowerQuery.includes('joindre') || lowerQuery.includes('téléphone')) {
+      return info.contact;
+    } else if (lowerQuery.includes('location') || lowerQuery.includes('where') || lowerQuery.includes('address') ||
+               lowerQuery.includes('localisation') || lowerQuery.includes('où') || lowerQuery.includes('adresse')) {
+      return info.location;
     } else if (lowerQuery.includes('linkedin') || lowerQuery.includes('social') || lowerQuery.includes('connect')) {
-      return drKaleabInfo.linkedin;
-    } else if (lowerQuery.includes('mission') || lowerQuery.includes('goal') || lowerQuery.includes('purpose')) {
-      return drKaleabInfo.mission;
-    } else if (lowerQuery.includes('vision') || lowerQuery.includes('passion') || lowerQuery.includes('about')) {
-      return drKaleabInfo.vision;
+      return info.linkedin;
+    } else if (lowerQuery.includes('mission') || lowerQuery.includes('goal') || lowerQuery.includes('purpose') ||
+               lowerQuery.includes('objectif') || lowerQuery.includes('but')) {
+      return info.mission;
+    } else if (lowerQuery.includes('vision') || lowerQuery.includes('passion') || lowerQuery.includes('about') ||
+               lowerQuery.includes('à propos')) {
+      return info.vision;
     } else {
-      return `Dr. Kaleab Nigusse is a Medical Doctor and Health Informatics Specialist with expertise in graphic design. ${drKaleabInfo.vision} Feel free to ask about his education, experience, specialties, contact information, or mission!`;
+      if (language === 'fr') {
+        return `Le Dr Kaleab Nigusse est Docteur en Médecine et Spécialiste en Informatique de Santé avec une expertise en design graphique. ${info.vision} N'hésitez pas à demander des informations sur son éducation, son expérience, ses spécialités, ses coordonnées ou sa mission !`;
+      } else {
+        return `Dr. Kaleab Nigusse is a Medical Doctor and Health Informatics Specialist with expertise in graphic design. ${info.vision} Feel free to ask about his education, experience, specialties, contact information, or mission!`;
+      }
     }
   };
 
@@ -104,6 +140,10 @@ const AIChatWidget: React.FC = () => {
     }
   };
 
+  const placeholderText = language === 'fr' ? 'Demandez des infos sur le Dr Kaleab...' : 'Ask about Dr. Kaleab...';
+  const headerTitle = language === 'fr' ? 'Assistant IA' : 'AI Assistant';
+  const headerSubtitle = language === 'fr' ? 'À propos du Dr Kaleab Nigusse' : 'About Dr. Kaleab Nigusse';
+
   return (
     <>
       {/* Chat Widget Button */}
@@ -128,8 +168,8 @@ const AIChatWidget: React.FC = () => {
                 </svg>
               </div>
               <div>
-                <h3 className="font-semibold">AI Assistant</h3>
-                <p className="text-sm text-white/80">About Dr. Kaleab Nigusse</p>
+                <h3 className="font-semibold">{headerTitle}</h3>
+                <p className="text-sm text-white/80">{headerSubtitle}</p>
               </div>
             </div>
           </div>
@@ -194,7 +234,7 @@ const AIChatWidget: React.FC = () => {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Ask about Dr. Kaleab..."
+                placeholder={placeholderText}
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3A7CA5] focus:border-transparent text-sm"
               />
               <button

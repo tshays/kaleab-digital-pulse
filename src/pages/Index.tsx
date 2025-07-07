@@ -33,7 +33,7 @@ const Index = () => {
       <ProjectsSection language={language} />
       <ContactSection language={language} />
       <Footer language={language} />
-      <AIChatWidget />
+      <AIChatWidget language={language} />
     </div>
   );
 };
