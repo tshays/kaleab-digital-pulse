@@ -14,7 +14,7 @@ const AIChatWidget: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: "Hello! I'm Dr. Kaleab, your virtual medical assistant. How can I help you today?",
+      text: "Hello! I'm Dr. Kaleab's virtual assistant. I can tell you about Dr. Kaleab Nigusse's background, education, experience, and expertise. What would you like to know?",
       isUser: false,
       timestamp: new Date()
     }
@@ -23,6 +23,19 @@ const AIChatWidget: React.FC = () => {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Dr. Kaleab's background information
+  const drKaleabInfo = {
+    education: "Dr. Kaleab Nigusse is a Medical Doctor (MD) with specialized training in Health Informatics, combining clinical expertise with technology innovation.",
+    experience: "He has extensive experience as both a practicing physician and a Senior Graphic Designer, uniquely bridging healthcare, technology, and creative design fields.",
+    specialties: "His areas of expertise include clinical medicine, health informatics, medical technology, graphic design, and healthcare communication.",
+    location: "Based in Dire Dawa, Ethiopia (Rue de France, Kezira), Dr. Kaleab serves both local and international clients.",
+    vision: "Dr. Kaleab is passionate about modernizing healthcare through technology and improving medical communication through thoughtful design.",
+    contact: "You can reach Dr. Kaleab at kalsonofzion@gmail.com, +251-91-023-7506, or visit his website at https://drkal.netlify.app/",
+    linkedin: "Connect with him professionally on LinkedIn at linkedin.com/in/kaleab-nigusse-md-885084111",
+    skills: "He excels in medical practice, health informatics systems, graphic design, web development, and healthcare technology integration.",
+    mission: "His mission is to bridge the gap between traditional healthcare and modern technology, making medical services more accessible and effective."
+  };
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -30,6 +43,30 @@ const AIChatWidget: React.FC = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  const getResponseForQuery = (query: string): string => {
+    const lowerQuery = query.toLowerCase();
+    
+    if (lowerQuery.includes('education') || lowerQuery.includes('study') || lowerQuery.includes('degree')) {
+      return drKaleabInfo.education;
+    } else if (lowerQuery.includes('experience') || lowerQuery.includes('work') || lowerQuery.includes('career')) {
+      return drKaleabInfo.experience;
+    } else if (lowerQuery.includes('specialty') || lowerQuery.includes('expertise') || lowerQuery.includes('skill')) {
+      return drKaleabInfo.specialties + " " + drKaleabInfo.skills;
+    } else if (lowerQuery.includes('contact') || lowerQuery.includes('reach') || lowerQuery.includes('phone') || lowerQuery.includes('email')) {
+      return drKaleabInfo.contact;
+    } else if (lowerQuery.includes('location') || lowerQuery.includes('where') || lowerQuery.includes('address')) {
+      return drKaleabInfo.location;
+    } else if (lowerQuery.includes('linkedin') || lowerQuery.includes('social') || lowerQuery.includes('connect')) {
+      return drKaleabInfo.linkedin;
+    } else if (lowerQuery.includes('mission') || lowerQuery.includes('goal') || lowerQuery.includes('purpose')) {
+      return drKaleabInfo.mission;
+    } else if (lowerQuery.includes('vision') || lowerQuery.includes('passion') || lowerQuery.includes('about')) {
+      return drKaleabInfo.vision;
+    } else {
+      return `Dr. Kaleab Nigusse is a Medical Doctor and Health Informatics Specialist with expertise in graphic design. ${drKaleabInfo.vision} Feel free to ask about his education, experience, specialties, contact information, or mission!`;
+    }
+  };
 
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
@@ -42,20 +79,22 @@ const AIChatWidget: React.FC = () => {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const userQuery = inputValue;
     setInputValue('');
     setIsTyping(true);
 
-    // Simulate AI response
+    // Generate response based on user query
     setTimeout(() => {
+      const response = getResponseForQuery(userQuery);
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
-        text: "Thank you for your question. While I'm here to provide general health information, I always recommend consulting with a qualified healthcare professional for proper medical advice and diagnosis. Is there anything specific you'd like to know about general health topics?",
+        text: response,
         isUser: false,
         timestamp: new Date()
       };
       setMessages(prev => [...prev, aiResponse]);
       setIsTyping(false);
-    }, 2000);
+    }, 1500);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -90,7 +129,7 @@ const AIChatWidget: React.FC = () => {
               </div>
               <div>
                 <h3 className="font-semibold">AI Assistant</h3>
-                <p className="text-sm text-white/80">Dr. Kaleab's Virtual Assistant</p>
+                <p className="text-sm text-white/80">About Dr. Kaleab Nigusse</p>
               </div>
             </div>
           </div>
@@ -155,7 +194,7 @@ const AIChatWidget: React.FC = () => {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Describe the issue..."
+                placeholder="Ask about Dr. Kaleab..."
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3A7CA5] focus:border-transparent text-sm"
               />
               <button
