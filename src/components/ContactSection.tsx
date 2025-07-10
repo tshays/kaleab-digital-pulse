@@ -1,7 +1,7 @@
-
 import React, { useState } from 'react';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 import { Mail, MessageSquare, Send, Phone, MapPin, Linkedin } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
 
 interface ContactSectionProps {
   language: 'en' | 'fr';
@@ -9,11 +9,13 @@ interface ContactSectionProps {
 
 const ContactSection: React.FC<ContactSectionProps> = ({ language }) => {
   const { ref, isVisible } = useScrollAnimation();
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     message: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const content = {
     en: {
@@ -32,7 +34,10 @@ const ContactSection: React.FC<ContactSectionProps> = ({ language }) => {
         linkedin: "LinkedIn Profile",
         website: "Visit Website",
         whatsapp: "WhatsApp Chat"
-      }
+      },
+      success: "Message sent successfully! I'll get back to you soon.",
+      error: "Failed to send message. Please try again or contact me directly.",
+      sending: "Sending..."
     },
     fr: {
       title: "Contactez-Moi",
@@ -50,7 +55,10 @@ const ContactSection: React.FC<ContactSectionProps> = ({ language }) => {
         linkedin: "Profil LinkedIn",
         website: "Visitez le Site",
         whatsapp: "Chat WhatsApp"
-      }
+      },
+      success: "Message envoyé avec succès ! Je vous répondrai bientôt.",
+      error: "Échec de l'envoi du message. Veuillez réessayer ou me contacter directement.",
+      sending: "Envoi en cours..."
     }
   };
 
@@ -62,12 +70,50 @@ const ContactSection: React.FC<ContactSectionProps> = ({ language }) => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here we would integrate with Firebase or email service
-    console.log('Form submitted:', formData);
-    // Reset form
-    setFormData({ name: '', email: '', message: '' });
+    setIsSubmitting(true);
+
+    try {
+      // Using EmailJS to send emails
+      const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          service_id: 'service_portfolio', // You'll need to set this up in EmailJS
+          template_id: 'template_contact', // You'll need to set this up in EmailJS
+          user_id: 'your_public_key', // You'll need to get this from EmailJS
+          template_params: {
+            from_name: formData.name,
+            from_email: formData.email,
+            to_email: 'kalsonofzion@gmail.com',
+            message: formData.message,
+            reply_to: formData.email,
+          }
+        })
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Success!",
+          description: content[language].success,
+        });
+        setFormData({ name: '', email: '', message: '' });
+      } else {
+        throw new Error('Failed to send email');
+      }
+    } catch (error) {
+      console.error('Error sending email:', error);
+      toast({
+        title: "Error",
+        description: content[language].error,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -100,6 +146,7 @@ const ContactSection: React.FC<ContactSectionProps> = ({ language }) => {
                     placeholder={content[language].form.name}
                     className="w-full px-4 py-3 rounded-lg border border-[#D9DCD6] focus:border-[#3A7CA5] focus:outline-none focus:ring-2 focus:ring-[#3A7CA5]/20 transition-all duration-300"
                     required
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div>
@@ -111,6 +158,7 @@ const ContactSection: React.FC<ContactSectionProps> = ({ language }) => {
                     placeholder={content[language].form.email}
                     className="w-full px-4 py-3 rounded-lg border border-[#D9DCD6] focus:border-[#3A7CA5] focus:outline-none focus:ring-2 focus:ring-[#3A7CA5]/20 transition-all duration-300"
                     required
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div>
@@ -122,14 +170,16 @@ const ContactSection: React.FC<ContactSectionProps> = ({ language }) => {
                     rows={6}
                     className="w-full px-4 py-3 rounded-lg border border-[#D9DCD6] focus:border-[#3A7CA5] focus:outline-none focus:ring-2 focus:ring-[#3A7CA5]/20 transition-all duration-300 resize-none"
                     required
+                    disabled={isSubmitting}
                   />
                 </div>
                 <button
                   type="submit"
-                  className="w-full bg-[#16425B] text-white px-8 py-4 rounded-lg font-semibold hover:bg-[#3A7CA5] hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
+                  disabled={isSubmitting}
+                  className="w-full bg-[#16425B] text-white px-8 py-4 rounded-lg font-semibold hover:bg-[#3A7CA5] hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   <Send size={20} />
-                  {content[language].form.send}
+                  {isSubmitting ? content[language].sending : content[language].form.send}
                 </button>
               </form>
             </div>
