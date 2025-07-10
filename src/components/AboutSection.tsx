@@ -1,10 +1,57 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 interface AboutSectionProps {
   language: 'en' | 'fr';
 }
+
+const CountingNumber: React.FC<{ target: number; duration?: number; suffix?: string }> = ({ 
+  target, 
+  duration = 2000, 
+  suffix = '' 
+}) => {
+  const [count, setCount] = useState(0);
+  const [hasStarted, setHasStarted] = useState(false);
+
+  useEffect(() => {
+    if (!hasStarted) return;
+
+    const startTime = Date.now();
+    const endTime = startTime + duration;
+
+    const timer = setInterval(() => {
+      const now = Date.now();
+      const progress = Math.min((now - startTime) / duration, 1);
+      
+      // Easing function for smooth animation
+      const easeOutExpo = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+      const currentCount = Math.floor(easeOutExpo * target);
+      
+      setCount(currentCount);
+
+      if (progress >= 1) {
+        clearInterval(timer);
+        setCount(target);
+      }
+    }, 16);
+
+    return () => clearInterval(timer);
+  }, [target, duration, hasStarted]);
+
+  // Start counting when component mounts
+  useEffect(() => {
+    const timer = setTimeout(() => setHasStarted(true), 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <span>
+      {count === target && target === Infinity ? '∞' : count}
+      {suffix}
+    </span>
+  );
+};
 
 const AboutSection: React.FC<AboutSectionProps> = ({ language }) => {
   const { ref, isVisible } = useScrollAnimation();
@@ -70,15 +117,21 @@ const AboutSection: React.FC<AboutSectionProps> = ({ language }) => {
               <div className="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-shadow duration-300">
                 <div className="grid grid-cols-2 gap-6 text-center">
                   <div className="p-4">
-                    <div className="text-3xl font-bold text-[#16425B] mb-2">5+</div>
+                    <div className="text-3xl font-bold text-[#16425B] mb-2">
+                      <CountingNumber target={5} suffix="+" />
+                    </div>
                     <div className="text-sm text-[#16425B]/70">{language === 'en' ? 'Years Experience' : 'Années d\'Expérience'}</div>
                   </div>
                   <div className="p-4">
-                    <div className="text-3xl font-bold text-[#3A7CA5] mb-2">100+</div>
+                    <div className="text-3xl font-bold text-[#3A7CA5] mb-2">
+                      <CountingNumber target={100} suffix="+" />
+                    </div>
                     <div className="text-sm text-[#16425B]/70">{language === 'en' ? 'Projects Completed' : 'Projets Complétés'}</div>
                   </div>
                   <div className="p-4">
-                    <div className="text-3xl font-bold text-[#81C3D7] mb-2">4</div>
+                    <div className="text-3xl font-bold text-[#81C3D7] mb-2">
+                      <CountingNumber target={4} />
+                    </div>
                     <div className="text-sm text-[#16425B]/70">{language === 'en' ? 'Languages' : 'Langues'}</div>
                   </div>
                   <div className="p-4">

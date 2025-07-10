@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 interface HeroSectionProps {
@@ -34,14 +33,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ language }) => {
 
   return (
     <section ref={ref} className="min-h-screen relative flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#16425B] via-[#3A7CA5] to-[#81C3D7]">
-      {/* Admin Button - Top Right */}
-      <Link 
-        to="/admin"
-        className="fixed top-4 right-4 z-50 bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-white/20 transition-all duration-300 border border-white/20"
-      >
-        Admin
-      </Link>
-
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Floating Medical Icons */}
